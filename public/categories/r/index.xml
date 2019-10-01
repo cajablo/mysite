@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>R | Caroline Jablonicky</title>
+    <link>/categories/r/</link>
+      <atom:link href="/categories/r/index.xml" rel="self" type="application/rss+xml" />
+    <description>R</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Mon, 30 Sep 2019 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>/img/self.jpg</url>
+      <title>R</title>
+      <link>/categories/r/</link>
+    </image>
+    
+    <item>
+      <title>TidyCensus Data &#43; Maps: Part 1</title>
+      <link>/post/2019-09-30-tidycensus_maps/</link>
+      <pubDate>Mon, 30 Sep 2019 00:00:00 +0000</pubDate>
+      <guid>/post/2019-09-30-tidycensus_maps/</guid>
+      <description>
+
+
+&lt;div id=&#34;tidycensus&#34; class=&#34;section level2&#34;&gt;
+&lt;h2&gt;TidyCensus&lt;/h2&gt;
+&lt;p&gt;The &lt;strong&gt;tidycensus&lt;/strong&gt; R package enables users to access to the US census and ACS data APIs, returning a data frame and potentially geometry of the features as well. It was developed by &lt;a href=&#34;https://walkerke.github.io/&#34;&gt;Kyle Walker&lt;/a&gt;, and a full description of the package can be found in this &lt;a href=&#34;https://walkerke.github.io/tidycensus/articles/basic-usage.html&#34;&gt;vignette&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;To get started we will load the necessary packages.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;#load packages
+library(tidyverse)
+library(sf)
+library(viridis)
+library(tidycensus)&lt;/code&gt;&lt;/pre&gt;
+&lt;div id=&#34;median-income-in-wa-state-counties&#34; class=&#34;section level3&#34;&gt;
+&lt;h3&gt;Median Income in WA State Counties&lt;/h3&gt;
+&lt;p&gt;Let’s look at median income in counties found in WA State. First let’s download the data into a sf data frame using the &lt;em&gt;get_acs()&lt;/em&gt; function.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;WA_county_income &amp;lt;- get_acs(geography = &amp;quot;county&amp;quot;,
+                            year = 2016,
+                            state = &amp;#39;WA&amp;#39;,
+                            table = &amp;quot;B19013&amp;quot;,
+                            geometry = TRUE)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;Following Kyle Walker’s example post, let’s examine the estimated median income and associated margin of error for WA state counties. It looks like King and Snohomish Counties have a much higher median income than the rest of the state. Since Seattle is located in King County, and Snohomish is just North of Seattle/King County this makes since.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;WA_county_income %&amp;gt;%
+  mutate(NAME = gsub(&amp;quot;County, Washington&amp;quot;, &amp;quot;&amp;quot;, NAME)) %&amp;gt;%
+  ggplot(aes(x = estimate, y = reorder(NAME, estimate))) +
+  geom_errorbarh(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+  geom_point(color = &amp;quot;green&amp;quot;, size = 1.5) +
+  theme_minimal() +
+  labs(title = &amp;quot;Household income by county in Washington State&amp;quot;,
+       subtitle = &amp;quot;2013-2017 American Community Survey&amp;quot;,
+       y = &amp;quot;&amp;quot;,
+       x = &amp;quot;ACS estimate (bars represent margin of error)&amp;quot;)&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-09-30-tidycensus_maps_files/figure-html/unnamed-chunk-1-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div id=&#34;mapping-median-income-in-wa-state&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Mapping Median Income in WA State&lt;/h1&gt;
+&lt;p&gt;Let’s make a quick map of median income by county in WA State.&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;ggplot() +
+  geom_sf(data = WA_county_income, aes(fill = estimate, color = estimate)) +
+  scale_color_viridis(option = &amp;quot;viridis&amp;quot;,
+                      direction = -1,
+                      guide = FALSE) +
+  theme_minimal() +
+  coord_sf(crs = 4269, datum = NA) +
+  labs(title = &amp;quot;Median household income&amp;quot;,
+       subtitle = &amp;quot;Washington State counties&amp;quot;,
+       caption = &amp;quot;Source: American Community Survey 2013-2017&amp;quot;,
+        fill= &amp;quot;ACS estimate&amp;quot;) +
+  theme(legend.position = &amp;quot;bottom&amp;quot;) +
+  scale_fill_viridis(
+    option = &amp;quot;viridis&amp;quot;,
+    direction = -1,
+    labels = scales::dollar,
+    # here we use guide_colourbar because it is still a continuous scale
+    guide = guide_colorbar(
+      direction = &amp;quot;horizontal&amp;quot;,
+      barheight = unit(2, units = &amp;quot;mm&amp;quot;),
+      barwidth = unit(70, units = &amp;quot;mm&amp;quot;),
+      draw.ulim = F,
+      title.position = &amp;#39;top&amp;#39;,
+      # some shifting around
+      title.hjust = 0.5,
+      label.hjust = 0.5
+  )) &lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;&lt;img src=&#34;/post/2019-09-30-tidycensus_maps_files/figure-html/unnamed-chunk-2-1.png&#34; width=&#34;672&#34; /&gt;&lt;/p&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+    <item>
+      <title>Hello R Markdown</title>
+      <link>/post/2015-07-23-r-rmarkdown/</link>
+      <pubDate>Thu, 23 Jul 2015 21:13:14 -0500</pubDate>
+      <guid>/post/2015-07-23-r-rmarkdown/</guid>
+      <description>
+
+
+&lt;div id=&#34;r-markdown&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;R Markdown&lt;/h1&gt;
+&lt;p&gt;This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see &lt;a href=&#34;http://rmarkdown.rstudio.com&#34; class=&#34;uri&#34;&gt;http://rmarkdown.rstudio.com&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;You can embed an R code chunk like this:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;summary(cars)
+##      speed           dist       
+##  Min.   : 4.0   Min.   :  2.00  
+##  1st Qu.:12.0   1st Qu.: 26.00  
+##  Median :15.0   Median : 36.00  
+##  Mean   :15.4   Mean   : 42.98  
+##  3rd Qu.:19.0   3rd Qu.: 56.00  
+##  Max.   :25.0   Max.   :120.00
+fit &amp;lt;- lm(dist ~ speed, data = cars)
+fit
+## 
+## Call:
+## lm(formula = dist ~ speed, data = cars)
+## 
+## Coefficients:
+## (Intercept)        speed  
+##     -17.579        3.932&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div id=&#34;including-plots&#34; class=&#34;section level1&#34;&gt;
+&lt;h1&gt;Including Plots&lt;/h1&gt;
+&lt;p&gt;You can also embed plots. See Figure &lt;a href=&#34;#fig:pie&#34;&gt;1&lt;/a&gt; for example:&lt;/p&gt;
+&lt;pre class=&#34;r&#34;&gt;&lt;code&gt;par(mar = c(0, 1, 0, 1))
+pie(
+  c(280, 60, 20),
+  c(&amp;#39;Sky&amp;#39;, &amp;#39;Sunny side of pyramid&amp;#39;, &amp;#39;Shady side of pyramid&amp;#39;),
+  col = c(&amp;#39;#0292D8&amp;#39;, &amp;#39;#F7EA39&amp;#39;, &amp;#39;#C4B632&amp;#39;),
+  init.angle = -50, border = NA
+)&lt;/code&gt;&lt;/pre&gt;
+&lt;div class=&#34;figure&#34;&gt;&lt;span id=&#34;fig:pie&#34;&gt;&lt;/span&gt;
+&lt;img src=&#34;/post/2015-07-23-r-rmarkdown_files/figure-html/pie-1.png&#34; alt=&#34;A fancy pie chart.&#34; width=&#34;672&#34; /&gt;
+&lt;p class=&#34;caption&#34;&gt;
+Figure 1: A fancy pie chart.
+&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+</description>
+    </item>
+    
+  </channel>
+</rss>

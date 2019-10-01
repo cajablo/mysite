@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Boris Worm | Caroline Jablonicky</title>
+    <link>/authors/boris-worm/</link>
+      <atom:link href="/authors/boris-worm/index.xml" rel="self" type="application/rss+xml" />
+    <description>Boris Worm</description>
+    <generator>Source Themes Academic (https://sourcethemes.com/academic/)</generator><language>en-us</language><copyright>© 2019</copyright><lastBuildDate>Fri, 11 Mar 2016 00:00:00 +0000</lastBuildDate>
+    <image>
+      <url>/img/self.jpg</url>
+      <title>Boris Worm</title>
+      <link>/authors/boris-worm/</link>
+    </image>
+    
+    <item>
+      <title>Ending Hide and Seek at Sea</title>
+      <link>/publication/ending-hide-and-seek-at-sea/</link>
+      <pubDate>Fri, 11 Mar 2016 00:00:00 +0000</pubDate>
+      <guid>/publication/ending-hide-and-seek-at-sea/</guid>
+      <description></description>
+    </item>
+    
+  </channel>
+</rss>
