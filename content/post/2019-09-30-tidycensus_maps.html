@@ -1,0 +1,73 @@
+---
+title: "TidyCensus Data + Maps: Part 1"
+author: "Caroline"
+date: 2019-09-30
+categories: ["R"]
+
+---
+
+
+
+<div id="tidycensus" class="section level2">
+<h2>TidyCensus</h2>
+<p>The <strong>tidycensus</strong> R package enables users to access to the US census and ACS data APIs, returning a data frame and potentially geometry of the features as well. It was developed by <a href="https://walkerke.github.io/">Kyle Walker</a>, and a full description of the package can be found in this <a href="https://walkerke.github.io/tidycensus/articles/basic-usage.html">vignette</a>.</p>
+<p>To get started we will load the necessary packages.</p>
+<pre class="r"><code>#load packages
+library(tidyverse)
+library(sf)
+library(viridis)
+library(tidycensus)</code></pre>
+<div id="median-income-in-wa-state-counties" class="section level3">
+<h3>Median Income in WA State Counties</h3>
+<p>Let’s look at median income in counties found in WA State. First let’s download the data into a sf data frame using the <em>get_acs()</em> function.</p>
+<pre class="r"><code>WA_county_income &lt;- get_acs(geography = &quot;county&quot;,
+                            year = 2016,
+                            state = &#39;WA&#39;,
+                            table = &quot;B19013&quot;,
+                            geometry = TRUE)</code></pre>
+<p>Following Kyle Walker’s example post, let’s examine the estimated median income and associated margin of error for WA state counties. It looks like King and Snohomish Counties have a much higher median income than the rest of the state. Since Seattle is located in King County, and Snohomish is just North of Seattle/King County this makes since.</p>
+<pre class="r"><code>WA_county_income %&gt;%
+  mutate(NAME = gsub(&quot;County, Washington&quot;, &quot;&quot;, NAME)) %&gt;%
+  ggplot(aes(x = estimate, y = reorder(NAME, estimate))) +
+  geom_errorbarh(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+  geom_point(color = &quot;green&quot;, size = 1.5) +
+  theme_minimal() +
+  labs(title = &quot;Household income by county in Washington State&quot;,
+       subtitle = &quot;2013-2017 American Community Survey&quot;,
+       y = &quot;&quot;,
+       x = &quot;ACS estimate (bars represent margin of error)&quot;)</code></pre>
+<p><img src="/post/2019-09-30-tidycensus_maps_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+</div>
+<div id="mapping-median-income-in-wa-state" class="section level1">
+<h1>Mapping Median Income in WA State</h1>
+<p>Let’s make a quick map of median income by county in WA State.</p>
+<pre class="r"><code>ggplot() +
+  geom_sf(data = WA_county_income, aes(fill = estimate, color = estimate)) +
+  scale_color_viridis(option = &quot;viridis&quot;,
+                      direction = -1,
+                      guide = FALSE) +
+  theme_minimal() +
+  coord_sf(crs = 4269, datum = NA) +
+  labs(title = &quot;Median household income&quot;,
+       subtitle = &quot;Washington State counties&quot;,
+       caption = &quot;Source: American Community Survey 2013-2017&quot;,
+        fill= &quot;ACS estimate&quot;) +
+  theme(legend.position = &quot;bottom&quot;) +
+  scale_fill_viridis(
+    option = &quot;viridis&quot;,
+    direction = -1,
+    labels = scales::dollar,
+    # here we use guide_colourbar because it is still a continuous scale
+    guide = guide_colorbar(
+      direction = &quot;horizontal&quot;,
+      barheight = unit(2, units = &quot;mm&quot;),
+      barwidth = unit(70, units = &quot;mm&quot;),
+      draw.ulim = F,
+      title.position = &#39;top&#39;,
+      # some shifting around
+      title.hjust = 0.5,
+      label.hjust = 0.5
+  )) </code></pre>
+<p><img src="/post/2019-09-30-tidycensus_maps_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>

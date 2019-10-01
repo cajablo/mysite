@@ -1,0 +1,88 @@
+---
+title: "TidyCensus Data + Maps: Part 1"
+author: "Caroline"
+date: 2019-09-30
+categories: ["R"]
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(collapse = TRUE)
+```
+
+##TidyCensus
+
+The **tidycensus** R package enables users to access to the US census and ACS data APIs, returning a data frame and potentially geometry of the features as well. It was developed by [Kyle Walker](https://walkerke.github.io/), and a full description of the package can be found in this [vignette](https://walkerke.github.io/tidycensus/articles/basic-usage.html). 
+
+To get started we will load the necessary packages. 
+
+```{r load packages, message=FALSE, warning=FALSE}
+#load packages
+library(tidyverse)
+library(sf)
+library(viridis)
+library(tidycensus)
+```
+
+### Median Income in WA State Counties
+
+Let's look at median income in counties found in WA State. First let's download the data into a sf data frame using the *get_acs()* function. 
+
+```{r pressure, results = 'hide', message=FALSE, quietly = TRUE}
+WA_county_income <- get_acs(geography = "county",
+                            year = 2016,
+                            state = 'WA',
+                            table = "B19013",
+                            geometry = TRUE)
+```
+
+Following Kyle Walker's example post, let's examine the estimated median income and associated margin of error for WA state counties. It looks like King and Snohomish Counties have a much higher median income than the rest of the state. Since Seattle is located in King County, and Snohomish is just North of Seattle/King County this makes since. 
+
+```{r}
+WA_county_income %>%
+  mutate(NAME = gsub("County, Washington", "", NAME)) %>%
+  ggplot(aes(x = estimate, y = reorder(NAME, estimate))) +
+  geom_errorbarh(aes(xmin = estimate - moe, xmax = estimate + moe)) +
+  geom_point(color = "green", size = 1.5) +
+  theme_minimal() +
+  labs(title = "Household income by county in Washington State",
+       subtitle = "2013-2017 American Community Survey",
+       y = "",
+       x = "ACS estimate (bars represent margin of error)")
+```
+
+#Mapping Median Income in WA State
+Let's make a quick map of median income by county in WA State.
+
+```{r}
+ggplot() +
+  geom_sf(data = WA_county_income, aes(fill = estimate, color = estimate)) +
+  scale_color_viridis(option = "viridis",
+                      direction = -1,
+                      guide = FALSE) +
+  theme_minimal() +
+  coord_sf(crs = 4269, datum = NA) +
+  labs(title = "Median household income",
+       subtitle = "Washington State counties",
+       caption = "Source: American Community Survey 2013-2017",
+        fill= "ACS estimate") +
+  theme(legend.position = "bottom") +
+  scale_fill_viridis(
+    option = "viridis",
+    direction = -1,
+    labels = scales::dollar,
+    # here we use guide_colourbar because it is still a continuous scale
+    guide = guide_colorbar(
+      direction = "horizontal",
+      barheight = unit(2, units = "mm"),
+      barwidth = unit(70, units = "mm"),
+      draw.ulim = F,
+      title.position = 'top',
+      # some shifting around
+      title.hjust = 0.5,
+      label.hjust = 0.5
+  )) 
+```
+
+
+
