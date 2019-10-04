@@ -1,7 +1,7 @@
 ---
 # Documentation: https://sourcethemes.com/academic/docs/managing-content/
 
-title: "Using Open Street Maps to Map Seattle Coffee Shops"
+title: "Using OpenStreetMap Data to Map Seattle Coffee Shops"
 subtitle: ""
 summary: ""
 authors: []
@@ -30,7 +30,7 @@ projects: []
 
 
 
-<p>Seattle is well known as a coffee hub. I decided to use Open Street Maps to explore where Seattle’s coffee shops are within the city, and explore how many of these shops belong to Starbucks versus more local chains.</p>
+<p>Seattle is well known as a coffee hub. I decided to use OpenStreetMap to explore where Seattle’s coffee shops are within the city, and explore how many of these shops belong to Starbucks versus more local chains.</p>
 <p>First let’s load some packages.</p>
 <pre class="r"><code>#load packages
 library(tidyverse)
@@ -38,9 +38,9 @@ library(osmdata)
 library(sf)
 library(ggmap)
 library(knitr)</code></pre>
-<div id="downloading-open-street-map-data" class="section level3">
-<h3>Downloading Open Street Map data</h3>
-<p>Using the Open Street Map R package (<em>osmdata</em>), we can get the locations of Seattle coffee shops.</p>
+<div id="downloading-openstreetmap-data" class="section level3">
+<h3>Downloading OpenStreetMap data</h3>
+<p>Using the OpenStreetMap R package (<em>osmdata</em>), we can get the locations of Seattle coffee shops.</p>
 <pre class="r"><code>
 q &lt;- getbb(&quot;Seattle&quot;) %&gt;%
       opq(timeout = 25) %&gt;%
@@ -286,7 +286,7 @@ sea_map +
              alpha = .6) +
   theme_minimal() +
   labs(title = &quot;Starbucks Location in Seattle&quot;,
-       caption = &quot;Source: Open Street Map, King County GIS, Stamen Design&quot;,
+       caption = &quot;Source: OpenStreetMap, King County GIS, Stamen Design&quot;,
        x = &quot;&quot;,
        y = &quot;&quot;) +
   theme(axis.text.x = element_blank(),
@@ -315,7 +315,7 @@ sea_map +
   theme_minimal() +
   #coord_sf(crs = 4269, datum = NA) +
   labs(title = &quot;Independent Coffee Shops in Seattle&quot;,
-       caption = &quot;Source: Open Street Map, King County GIS, Stamen Design&quot;,
+       caption = &quot;Source: OpenStreetMap, King County GIS, Stamen Design&quot;,
        x = &quot;&quot;,
        y = &quot;&quot;) +
   theme(axis.text.x = element_blank(),
@@ -341,7 +341,7 @@ sea_map +
   ) +
   theme_minimal() +
   labs(title = &quot;Density of Starbucks in Seattle&quot;,
-       caption = &quot;Source: Open Street Map, King County GIS, Stamen Design&quot;,
+       caption = &quot;Source: OpenStreetMap, King County GIS, Stamen Design&quot;,
        x = &quot;&quot;,
        y = &quot;&quot;) +
   scale_fill_gradient(low = &quot;light green&quot;, high = &quot;forest green&quot;) +
@@ -358,4 +358,13 @@ sea_map +
         plot.title = element_text(size = 15, hjust = 0.5)
         )</code></pre>
 <p><img src="/post/using-open-street-maps-to-map-seattle-coffee-shops_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+</div>
+<div id="resources" class="section level3">
+<h3>Resources</h3>
+<p>Here are some websites that are useful for working with OpenStreetMap data</p>
+<ul>
+<li><a href="https://dominicroye.github.io/en/2018/accessing-openstreetmap-data-with-r/" class="uri">https://dominicroye.github.io/en/2018/accessing-openstreetmap-data-with-r/</a> (helpful tutorial on working with OpenStreetMaps + osmr package)</li>
+<li><a href="http://overpass-turbo.eu/" class="uri">http://overpass-turbo.eu/</a> (allows you explore OpenStreetMap Data)</li>
+<li><a href="https://wiki.openstreetmap.org/wiki/Map_Features" class="uri">https://wiki.openstreetmap.org/wiki/Map_Features</a> (OpenStreetMap wiki for map features, helpful for building queries)</li>
+</ul>
 </div>
