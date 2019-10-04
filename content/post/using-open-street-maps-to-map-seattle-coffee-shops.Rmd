@@ -1,7 +1,7 @@
 ---
 # Documentation: https://sourcethemes.com/academic/docs/managing-content/
 
-title: "Using Open Street Maps to Map Seattle Coffee Shops"
+title: "Using OpenStreetMap Data to Map Seattle Coffee Shops"
 subtitle: ""
 summary: ""
 authors: []
@@ -32,7 +32,7 @@ projects: []
 knitr::opts_chunk$set(collapse = TRUE)
 ```
 
-Seattle is well known as a coffee hub. I decided to use Open Street Maps to explore where Seattle's coffee shops are within the city, and explore how many of these shops belong to Starbucks versus more local chains.
+Seattle is well known as a coffee hub. I decided to use OpenStreetMap to explore where Seattle's coffee shops are within the city, and explore how many of these shops belong to Starbucks versus more local chains.
 
 First let's load some packages.
 ```{r message = FALSE}
@@ -44,8 +44,8 @@ library(ggmap)
 library(knitr)
 ```
 
-###Downloading Open Street Map data
-Using the Open Street Map R package (*osmdata*), we can get the locations of Seattle coffee shops.  
+###Downloading OpenStreetMap data
+Using the OpenStreetMap R package (*osmdata*), we can get the locations of Seattle coffee shops.  
 ```{r}
 
 q <- getbb("Seattle") %>%
@@ -149,7 +149,7 @@ sea_map +
              alpha = .6) +
   theme_minimal() +
   labs(title = "Starbucks Location in Seattle",
-       caption = "Source: Open Street Map, King County GIS, Stamen Design",
+       caption = "Source: OpenStreetMap, King County GIS, Stamen Design",
        x = "",
        y = "") +
   theme(axis.text.x = element_blank(),
@@ -182,7 +182,7 @@ sea_map +
   theme_minimal() +
   #coord_sf(crs = 4269, datum = NA) +
   labs(title = "Independent Coffee Shops in Seattle",
-       caption = "Source: Open Street Map, King County GIS, Stamen Design",
+       caption = "Source: OpenStreetMap, King County GIS, Stamen Design",
        x = "",
        y = "") +
   theme(axis.text.x = element_blank(),
@@ -212,7 +212,7 @@ sea_map + stat_density2d(
   ) +
   theme_minimal() +
   labs(title = "Density of Starbucks in Seattle",
-       caption = "Source: Open Street Map, King County GIS, Stamen Design",
+       caption = "Source: OpenStreetMap, King County GIS, Stamen Design",
        x = "",
        y = "") +
   scale_fill_gradient(low = "light green", high = "forest green") +
@@ -228,5 +228,13 @@ sea_map + stat_density2d(
                                 color = "#939184"),
         plot.title = element_text(size = 15, hjust = 0.5)
         )
-  
 ```
+
+###Resources
+Here are some websites that are useful for working with OpenStreetMap data
+
+- https://dominicroye.github.io/en/2018/accessing-openstreetmap-data-with-r/ (helpful tutorial on working with OpenStreetMaps + osmr package)
+- http://overpass-turbo.eu/ (allows you explore OpenStreetMap Data)
+- https://wiki.openstreetmap.org/wiki/Map_Features (OpenStreetMap wiki for map features, helpful for building queries)
+
+
